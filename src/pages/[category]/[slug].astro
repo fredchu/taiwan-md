@@ -2,6 +2,7 @@
 import { readdir, readFile } from 'fs/promises';
 import { resolve, join, basename } from 'path';
 import matter from 'gray-matter';
+import { categoryConfig, getCategoryConfig, type CategoryKey } from '../../utils/categoryConfig';
 
 export async function getStaticPaths() {
   const paths: any[] = [];
@@ -94,9 +95,6 @@ export async function getStaticPaths() {
   }
 
   console.log(`Generated ${paths.length} paths for articles`);
-  paths.forEach(path => {
-    console.log(`Path: /${path.params.category}/${path.params.slug} (${path.props.title})`);
-  });
 
   return paths;
 }
@@ -106,22 +104,19 @@ import Layout from '../../layouts/Layout.astro';
 const { title, description, content, frontmatter, lang } = Astro.props;
 const { category, slug } = Astro.params;
 
-const categoryInfo = {
-  'history': { name: '歷史', icon: '📜' },
-  'geography': { name: '地理', icon: '🗺️' },
-  'culture': { name: '文化', icon: '🎭' },
-  'food': { name: '美食', icon: '🍜' },
-  'art': { name: '藝術', icon: '🎨' },
-  'music': { name: '音樂', icon: '🎵' },
-  'technology': { name: '科技', icon: '💻' },
-  'nature': { name: '自然', icon: '🌿' },
-  'people': { name: '人物', icon: '👥' },
-  'society': { name: '社會', icon: '🏛️' },
-  'economy': { name: '經濟', icon: '📊' },
-  'lifestyle': { name: '生活', icon: '🏠' }
-};
+const categoryInfo = getCategoryConfig(category);
+if (!categoryInfo) {
+  throw new Error(`Unknown category: ${category}`);
+}
 
-const currentCategory = categoryInfo[category as keyof typeof categoryInfo];
+// 推薦文章 (簡化版，取同分類的其他文章)
+const otherCategories = Object.keys(categoryConfig)
+  .filter(cat => cat !== category)
+  .slice(0, 3)
+  .map(cat => ({
+    key: cat,
+    ...categoryConfig[cat as CategoryKey]
+  }));
 
 // 處理 Markdown 內容以支援基本 HTML 渲染
 function processMarkdown(markdownContent: string) {
@@ -153,61 +148,67 @@ const processedContent = processMarkdown(content);
   title={`${title} - Taiwan.md`}
   description={description}
 >
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress" id="reading-progress"></div>
+
   <main class="article-page">
+    <!-- Article Header Banner -->
+    <section class="article-header-banner" style={`background: ${categoryInfo.gradient};`}>
+      <div class="header-content">
+        <nav class="breadcrumb-header">
+          <a href="/">首頁</a>
+          <span class="separator">›</span>
+          <a href={`/${category}`}>{categoryInfo.name}</a>
+          <span class="separator">›</span>
+          <span class="current">{title}</span>
+        </nav>
+        
+        <h1 class="article-title-header">{title}</h1>
+        <p class="article-description-header">{description}</p>
+      </div>
+    </section>
+
+    <!-- Article Content -->
     <div class="container">
-      <!-- Breadcrumb -->
-      <nav class="breadcrumb">
-        <a href="/">首頁</a>
-        <span class="separator">›</span>
-        <a href={`/${category}`}>{currentCategory?.name || category}</a>
-        <span class="separator">›</span>
-        <span class="current">{title}</span>
-      </nav>
-
-      <!-- Article Header -->
-      <header class="article-header">
-        <div class="category-label">
-          <span class="category-icon">{currentCategory?.icon || '📄'}</span>
-          <span class="category-name">{currentCategory?.name || category}</span>
-        </div>
-        
-        <h1 class="article-title">{title}</h1>
-        
-        <p class="article-description">{description}</p>
-
+      <article class="article-content">
+        <!-- Meta Information -->
         <div class="article-meta">
-          {frontmatter.readingTime && (
-            <div class="meta-item">
-              <span class="meta-icon">📖</span>
-              <span>{frontmatter.readingTime} 分鐘閱讀</span>
+          <div class="meta-group">
+            <div class="category-badge" style={`background: ${categoryInfo.colorLight}; color: ${categoryInfo.color}; border-color: ${categoryInfo.color};`}>
+              <span class="category-icon">{categoryInfo.icon}</span>
+              <span class="category-name">{categoryInfo.name}</span>
             </div>
-          )}
-          
-          {frontmatter.date && (
-            <div class="meta-item">
-              <span class="meta-icon">📅</span>
-              <span>{new Date(frontmatter.date).toLocaleDateString('zh-TW')}</span>
-            </div>
-          )}
+            
+            {frontmatter.readingTime && (
+              <div class="meta-item">
+                <span class="meta-icon">📖</span>
+                <span>{frontmatter.readingTime} 分鐘閱讀</span>
+              </div>
+            )}
+            
+            {frontmatter.date && (
+              <div class="meta-item">
+                <span class="meta-icon">📅</span>
+                <span>{new Date(frontmatter.date).toLocaleDateString('zh-TW')}</span>
+              </div>
+            )}
 
-          {frontmatter.status && (
-            <div class="meta-item">
-              <span class="meta-icon">🎯</span>
-              <span class="status">{frontmatter.status}</span>
-            </div>
-          )}
+            {frontmatter.status && (
+              <div class="meta-item">
+                <span class="status-tag" style={`background: ${categoryInfo.colorLight}; color: ${categoryInfo.color};`}>{frontmatter.status}</span>
+              </div>
+            )}
+          </div>
           
           {lang && (
-            <div class="meta-item">
+            <div class="lang-badge">
               <span class="meta-icon">🌐</span>
               <span>{lang === 'zh-TW' ? '繁體中文' : 'English'}</span>
             </div>
           )}
         </div>
-      </header>
 
-      <!-- Article Content -->
-      <article class="article-content">
+        <!-- Main Content -->
         <div class="content" set:html={processedContent}></div>
         
         {frontmatter.source && (
@@ -220,14 +221,65 @@ const processedContent = processMarkdown(content);
             </ul>
           </div>
         )}
+
+        <!-- Tags and Share -->
+        <div class="article-footer">
+          <div class="tags-section">
+            {frontmatter.tags && frontmatter.tags.length > 0 && (
+              <div class="tags">
+                {frontmatter.tags.map((tag: string) => (
+                  <span class="tag" style={`background: ${categoryInfo.colorLight}; color: ${categoryInfo.color};`}>{tag}</span>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          <div class="share-section">
+            <span class="share-label">分享這篇文章：</span>
+            <div class="share-buttons">
+              <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(`https://taiwan.md/${category}/${slug}`)}`} 
+                 target="_blank" 
+                 class="share-btn twitter">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+                </svg>
+                Twitter
+              </a>
+              <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://taiwan.md/${category}/${slug}`)}`} 
+                 target="_blank" 
+                 class="share-btn facebook">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+                </svg>
+                Facebook
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- More Articles -->
+        <div class="more-articles">
+          <h3 class="more-title">探索更多台灣面向</h3>
+          <div class="more-grid">
+            {otherCategories.map(cat => (
+              <a href={`/${cat.key}`} class="more-card" style={`border-color: ${cat.color};`}>
+                <div class="more-card-icon" style={`color: ${cat.color};`}>{cat.icon}</div>
+                <div class="more-card-content">
+                  <div class="more-card-name" style={`color: ${cat.color};`}>{cat.name}</div>
+                  <div class="more-card-desc">{cat.description}</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
       </article>
 
-      <!-- Back Navigation -->
-      <div class="back-navigation">
-        <a href={`/${category}`} class="btn-secondary">
-          ← 返回 {currentCategory?.name || category}
+      <!-- Navigation -->
+      <div class="article-navigation">
+        <a href={`/${category}`} class="nav-btn back-btn" style={`background: ${categoryInfo.color};`}>
+          ← 返回 {categoryInfo.name}
         </a>
-        <a href="/" class="btn-secondary">
+        <a href="/" class="nav-btn home-btn">
           返回首頁
         </a>
       </div>
@@ -235,85 +287,149 @@ const processedContent = processMarkdown(content);
   </main>
 </Layout>
 
-<style>
+<script>
+  // Reading progress bar
+  function updateReadingProgress() {
+    const article = document.querySelector('.content');
+    if (!article) return;
+    
+    const scrolled = window.scrollY;
+    const articleTop = article.offsetTop;
+    const articleHeight = article.offsetHeight;
+    const windowHeight = window.innerHeight;
+    
+    const progress = Math.min(
+      Math.max((scrolled - articleTop + windowHeight * 0.3) / articleHeight * 100, 0),
+      100
+    );
+    
+    const progressBar = document.getElementById('reading-progress');
+    if (progressBar) {
+      progressBar.style.width = progress + '%';
+    }
+  }
+  
+  window.addEventListener('scroll', updateReadingProgress);
+  window.addEventListener('resize', updateReadingProgress);
+  updateReadingProgress();
+</script>
+
+<style define:vars={{ categoryColor: categoryInfo.color, categoryColorLight: categoryInfo.colorLight }}>
+  /* Reading Progress Bar */
+  .reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 4px;
+    background: var(--categoryColor);
+    z-index: 1000;
+    transition: width 0.1s ease;
+  }
+
   .article-page {
     min-height: 100vh;
-    padding: 2rem 0;
   }
 
-  .container {
+  /* Header Banner */
+  .article-header-banner {
+    width: 100%;
+    padding: 3rem 2rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header-content {
     max-width: 800px;
     margin: 0 auto;
-    padding: 0 2rem;
   }
 
-  .breadcrumb {
+  .breadcrumb-header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 2rem;
     font-size: 0.9rem;
+    opacity: 0.9;
   }
 
-  .breadcrumb a {
-    color: #1e40af;
+  .breadcrumb-header a {
+    color: white;
     text-decoration: none;
+    font-weight: 500;
   }
 
-  .breadcrumb a:hover {
+  .breadcrumb-header a:hover {
     text-decoration: underline;
   }
 
   .separator {
-    color: #9ca3af;
+    color: rgba(255, 255, 255, 0.7);
   }
 
   .current {
-    color: #6b7280;
+    color: rgba(255, 255, 255, 0.8);
   }
 
-  .article-header {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  .category-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: #f3f4f6;
-    color: #374151;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin-bottom: 1.5rem;
-  }
-
-  .category-icon {
-    font-size: 1rem;
-  }
-
-  .article-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #1f2937;
+  .article-title-header {
+    font-size: 3rem;
+    font-weight: 800;
     line-height: 1.2;
     margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
-  .article-description {
-    font-size: 1.2rem;
-    color: #6b7280;
-    line-height: 1.6;
-    margin-bottom: 2rem;
+  .article-description-header {
+    font-size: 1.3rem;
+    line-height: 1.5;
+    opacity: 0.95;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Container */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* Article Content */
+  .article-content {
+    margin-bottom: 3rem;
   }
 
   .article-meta {
     display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  .meta-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .category-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .category-icon {
+    font-size: 1.1rem;
   }
 
   .meta-item {
@@ -328,96 +444,113 @@ const processedContent = processMarkdown(content);
     font-size: 1rem;
   }
 
-  .status {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+  .status-tag {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
     font-weight: 500;
     font-size: 0.8rem;
-    background: #f0f9ff;
-    color: #0369a1;
   }
 
-  .article-content {
-    margin-bottom: 3rem;
-    line-height: 1.7;
+  .lang-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #6b7280;
   }
 
+  /* Content Styling */
   .content {
-    font-size: 1.1rem;
+    font-size: 1.125rem;
+    line-height: 1.8;
     color: #374151;
+    max-width: 740px;
+    margin: 0 auto;
+  }
+
+  .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: #1f2937;
+    margin: 2rem 0 1rem 0;
+    line-height: 1.3;
   }
 
   .content h1 {
-    font-size: 2rem;
+    font-size: 2.25rem;
     font-weight: 700;
-    margin: 2rem 0 1rem 0;
-    color: #1f2937;
   }
 
   .content h2 {
-    font-size: 1.5rem;
+    font-size: 1.875rem;
     font-weight: 600;
-    margin: 1.5rem 0 1rem 0;
-    color: #1f2937;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 3px solid var(--categoryColor);
     padding-bottom: 0.5rem;
   }
 
   .content h3 {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 600;
-    margin: 1.25rem 0 0.75rem 0;
-    color: #1f2937;
   }
 
   .content p {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   .content blockquote {
-    border-left: 4px solid #3b82f6;
-    background: #f8fafc;
-    padding: 1rem 1.5rem;
-    margin: 1.5rem 0;
+    border-left: 6px solid var(--categoryColor);
+    background: linear-gradient(to right, var(--categoryColorLight), transparent);
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
     font-style: italic;
-    color: #475569;
+    color: #4b5563;
+    border-radius: 0 8px 8px 0;
   }
 
   .content ul, .content ol {
-    margin: 1rem 0;
+    margin: 1.5rem 0;
     padding-left: 2rem;
   }
 
   .content li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
   }
 
   .content a {
-    color: #1e40af;
+    color: var(--categoryColor);
     text-decoration: underline;
+    font-weight: 500;
   }
 
   .content a:hover {
-    color: #1e3a8a;
+    text-decoration: none;
   }
 
   .content strong {
-    font-weight: 600;
+    font-weight: 700;
     color: #1f2937;
   }
 
+  .content em {
+    font-style: italic;
+  }
+
+  /* Sources */
   .sources {
-    margin-top: 3rem;
+    margin: 3rem 0;
     padding: 2rem;
     background: #f9fafb;
-    border-radius: 8px;
+    border-radius: 12px;
     border: 1px solid #e5e7eb;
   }
 
   .sources h3 {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     margin-bottom: 1rem;
     color: #1f2937;
+    font-weight: 600;
   }
 
   .sources ul {
@@ -430,7 +563,7 @@ const processedContent = processMarkdown(content);
   }
 
   .sources a {
-    color: #1e40af;
+    color: var(--categoryColor);
     text-decoration: none;
     font-size: 0.9rem;
   }
@@ -439,47 +572,211 @@ const processedContent = processMarkdown(content);
     text-decoration: underline;
   }
 
-  .back-navigation {
+  /* Article Footer */
+  .article-footer {
+    margin: 3rem 0;
+    padding: 2rem 0;
+    border-top: 2px solid #f1f5f9;
+  }
+
+  .tags-section {
+    margin-bottom: 2rem;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .share-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .share-label {
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .share-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .share-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #f3f4f6;
+    color: #374151;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .share-btn:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+  }
+
+  .share-btn.twitter:hover {
+    background: #1da1f2;
+    color: white;
+  }
+
+  .share-btn.facebook:hover {
+    background: #1877f2;
+    color: white;
+  }
+
+  /* More Articles */
+  .more-articles {
+    margin: 4rem 0;
+    padding: 3rem 0;
+    border-top: 2px solid #f1f5f9;
+  }
+
+  .more-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 2rem;
+  }
+
+  .more-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .more-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: white;
+    border: 2px solid;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .more-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .more-card-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .more-card-content {
+    flex: 1;
+  }
+
+  .more-card-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .more-card-desc {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  /* Navigation */
+  .article-navigation {
     display: flex;
     gap: 1rem;
     justify-content: center;
     flex-wrap: wrap;
-    padding-top: 2rem;
-    border-top: 1px solid #e5e7eb;
+    margin: 3rem 0;
   }
 
-  .btn-secondary {
+  .nav-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: #6b7280;
-    color: white;
+    padding: 1rem 2rem;
     text-decoration: none;
-    border-radius: 6px;
-    font-weight: 500;
-    transition: background 0.2s ease;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: white;
   }
 
-  .btn-secondary:hover {
-    background: #4b5563;
+  .back-btn {
+    /* background set by style attribute */
   }
 
+  .home-btn {
+    background: #6b7280;
+  }
+
+  .nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Responsive */
   @media (max-width: 768px) {
-    .container {
-      padding: 0 1rem;
+    .article-header-banner {
+      padding: 2rem 1rem;
     }
 
-    .article-title {
+    .article-title-header {
       font-size: 2rem;
+    }
+
+    .article-description-header {
+      font-size: 1.1rem;
+    }
+
+    .container {
+      padding: 1rem;
+    }
+
+    .content {
+      font-size: 1rem;
+    }
+
+    .content h2 {
+      font-size: 1.5rem;
     }
 
     .article-meta {
       flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .share-section {
+      flex-direction: column;
+      align-items: flex-start;
       gap: 0.75rem;
     }
 
-    .back-navigation {
+    .more-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .article-navigation {
       flex-direction: column;
       align-items: center;
     }

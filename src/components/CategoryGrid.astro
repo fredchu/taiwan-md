@@ -6,7 +6,8 @@ const categories = [
     slug: 'history', 
     description: '從史前時代到現代，台灣歷史的完整脈絡',
     icon: '📜',
-    color: 'from-amber-500 to-orange-600'
+    color: 'from-amber-500 to-orange-600',
+    articles: 8
   },
   { 
     name: '地理', 
@@ -14,7 +15,8 @@ const categories = [
     slug: 'geography', 
     description: '台灣的自然環境、地形特色與區域發展',
     icon: '🗺️',
-    color: 'from-emerald-500 to-teal-600'
+    color: 'from-emerald-500 to-teal-600',
+    articles: 6
   },
   { 
     name: '文化', 
@@ -22,7 +24,8 @@ const categories = [
     slug: 'culture', 
     description: '多元族群文化的融合與在地特色',
     icon: '🎭',
-    color: 'from-purple-500 to-violet-600'
+    color: 'from-purple-500 to-violet-600',
+    articles: 5
   },
   { 
     name: '美食', 
@@ -30,7 +33,8 @@ const categories = [
     slug: 'food', 
     description: '從夜市小吃到精緻料理的美食文化',
     icon: '🍜',
-    color: 'from-rose-500 to-pink-600'
+    color: 'from-rose-500 to-pink-600',
+    articles: 4
   },
   { 
     name: '藝術', 
@@ -38,7 +42,8 @@ const categories = [
     slug: 'art', 
     description: '傳統工藝到當代藝術的創作能量',
     icon: '🎨',
-    color: 'from-cyan-500 to-blue-600'
+    color: 'from-cyan-500 to-blue-600',
+    articles: 3
   },
   { 
     name: '音樂', 
@@ -46,7 +51,8 @@ const categories = [
     slug: 'music', 
     description: '從原住民音樂到流行音樂的聲音風景',
     icon: '🎵',
-    color: 'from-indigo-500 to-purple-600'
+    color: 'from-indigo-500 to-purple-600',
+    articles: 2
   },
   { 
     name: '科技', 
@@ -54,7 +60,8 @@ const categories = [
     slug: 'technology', 
     description: '科技島的創新發展與數位轉型',
     icon: '💻',
-    color: 'from-slate-500 to-gray-600'
+    color: 'from-slate-500 to-gray-600',
+    articles: 4
   },
   { 
     name: '自然', 
@@ -62,7 +69,8 @@ const categories = [
     slug: 'nature', 
     description: '豐富的生態環境與環保議題',
     icon: '🌿',
-    color: 'from-green-500 to-emerald-600'
+    color: 'from-green-500 to-emerald-600',
+    articles: 3
   },
   { 
     name: '人物', 
@@ -70,7 +78,8 @@ const categories = [
     slug: 'people', 
     description: '影響台灣發展的重要人物與故事',
     icon: '👥',
-    color: 'from-orange-500 to-red-600'
+    color: 'from-orange-500 to-red-600',
+    articles: 5
   },
   { 
     name: '社會', 
@@ -78,7 +87,8 @@ const categories = [
     slug: 'society', 
     description: '社會變遷與當代議題的深度探討',
     icon: '🏛️',
-    color: 'from-blue-500 to-indigo-600'
+    color: 'from-blue-500 to-indigo-600',
+    articles: 3
   },
   { 
     name: '經濟', 
@@ -86,7 +96,8 @@ const categories = [
     slug: 'economy', 
     description: '經濟奇蹟的成因與轉型挑戰',
     icon: '📊',
-    color: 'from-yellow-500 to-amber-600'
+    color: 'from-yellow-500 to-amber-600',
+    articles: 2
   },
   { 
     name: '生活', 
@@ -94,7 +105,8 @@ const categories = [
     slug: 'lifestyle', 
     description: '台灣人的生活方式與價值觀',
     icon: '🏠',
-    color: 'from-teal-500 to-cyan-600'
+    color: 'from-teal-500 to-cyan-600',
+    articles: 2
   }
 ];
 
@@ -112,11 +124,22 @@ const langPrefix = lang === 'en' ? '/en' : '';
       <div class="category-header">
         <div class="category-icon">{category.icon}</div>
         <div class="category-gradient"></div>
+        <div class="article-badge">
+          <span class="article-count">{category.articles}</span>
+          <span class="article-label">篇</span>
+        </div>
       </div>
-      <h3 class="category-name">
-        {lang === 'en' ? category.name_en : category.name}
-      </h3>
-      <p class="category-description">{category.description}</p>
+      <div class="category-body">
+        <h3 class="category-name">
+          {lang === 'en' ? category.name_en : category.name}
+        </h3>
+        <p class="category-description">{category.description}</p>
+        <div class="category-footer">
+          <span class="explore-link">
+            探索 →
+          </span>
+        </div>
+      </div>
     </a>
   ))}
 </div>
@@ -124,36 +147,60 @@ const langPrefix = lang === 'en' ? '/en' : '';
 <style>
   .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5rem;
-    margin: 2rem 0;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
   }
   
   .category-card {
     background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 0;
+    border: 2px solid #f1f5f9;
+    border-radius: 20px;
     text-decoration: none;
     color: inherit;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+      0 4px 6px rgba(0, 0, 0, 0.05),
+      0 1px 3px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 280px;
   }
   
   .category-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+      0 20px 40px rgba(0, 0, 0, 0.1),
+      0 15px 20px rgba(0, 0, 0, 0.08);
+    border-color: #e2e8f0;
+  }
+  
+  .category-card:hover .category-gradient {
+    opacity: 0.2;
+  }
+  
+  .category-card:hover .category-icon {
+    transform: scale(1.1) rotate(5deg);
+  }
+  
+  .category-card:hover .explore-link {
+    opacity: 1;
+    transform: translateX(0);
   }
   
   .category-header {
     position: relative;
-    height: 80px;
+    height: 120px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    flex-shrink: 0;
   }
   
   .category-gradient {
@@ -162,8 +209,33 @@ const langPrefix = lang === 'en' ? '/en' : '';
     left: 0;
     right: 0;
     bottom: 0;
-    opacity: 0.1;
-    transition: opacity 0.3s ease;
+    opacity: 0.12;
+    transition: opacity 0.4s ease;
+  }
+  
+  /* 文章數量 badge */
+  .article-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .article-count {
+    color: #dc2626;
+    font-weight: 700;
+    font-size: 0.9rem;
   }
   
   /* Color gradients for each category */
@@ -215,34 +287,87 @@ const langPrefix = lang === 'en' ? '/en' : '';
     background: linear-gradient(135deg, #14b8a6, #0891b2);
   }
   
-  .category-card:hover .category-gradient {
-    opacity: 0.15;
-  }
-  
   .category-icon {
-    font-size: 2.5rem;
+    font-size: 3.5rem;
     position: relative;
     z-index: 2;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .category-body {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
   
   .category-name {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 1rem 1.5rem 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
     color: #1f2937;
   }
   
   .category-description {
     color: #6b7280;
-    font-size: 0.9rem;
+    font-size: 1rem;
     line-height: 1.6;
-    margin: 0 1.5rem 1.5rem;
+    margin-bottom: 1rem;
+    flex: 1;
+  }
+  
+  .category-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: auto;
+  }
+  
+  .explore-link {
+    color: #3b82f6;
+    font-weight: 600;
+    font-size: 0.9rem;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+  }
+  
+  @media (max-width: 1200px) {
+    .category-grid {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
   }
   
   @media (max-width: 768px) {
     .category-grid {
       grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin: 2rem 1rem;
+    }
+    
+    .category-card {
+      height: 260px;
+    }
+    
+    .category-header {
+      height: 100px;
+    }
+    
+    .category-icon {
+      font-size: 3rem;
+    }
+    
+    .category-name {
+      font-size: 1.3rem;
+    }
+    
+    .category-description {
+      font-size: 0.9rem;
+    }
+    
+    .article-badge {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.75rem;
     }
   }
 </style>
