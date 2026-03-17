@@ -732,98 +732,68 @@ import CategoryGrid from '../components/CategoryGrid.astro';
     }
   }
 
-  /* Cover Story - 策展級重設計 */
+  /* Cover Story — 文學明體 timeline */
   .cover-story {
-    padding: 5rem 2rem;
-    background: linear-gradient(180deg, #fff 0%, #f0f4f8 100%);
-    position: relative;
-    overflow: hidden;
-  }
-  .cover-story::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 50%;
-    transform: translateX(-50%);
-    width: 1px;
-    height: 100%;
-    background: linear-gradient(180deg, transparent, #cbd5e1 10%, #3b82f6 50%, #cbd5e1 90%, transparent);
-    opacity: 0.4;
+    padding: 6rem 2rem;
+    background: #fafbfc;
   }
   .cover-content {
-    max-width: 800px;
+    max-width: 780px;
     margin: 0 auto;
-    position: relative;
   }
   .cover-content h2 {
-    font-size: 1.6rem;
-    color: #64748b;
-    margin-bottom: 0.5rem;
+    font-family: "Noto Serif TC", "Source Han Serif TC", "PMingLiU", serif;
+    font-size: 2rem;
+    color: #1a1a2e;
+    margin-bottom: 1rem;
     text-align: center;
-    font-weight: 400;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.1em;
   }
   .cover-lead {
     text-align: center;
-    font-size: 1.2rem;
-    color: #334155;
+    font-family: "Noto Serif TC", "Source Han Serif TC", "PMingLiU", serif;
+    font-size: 1.1rem;
+    color: #475569;
     line-height: 2;
-    margin-bottom: 3.5rem;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-bottom: 3rem;
   }
   .quotes-timeline {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
+    position: relative;
+    padding-left: 3rem;
   }
-  @media (max-width: 768px) {
-    .quotes-timeline { grid-template-columns: 1fr; }
+  .quotes-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, #e2e8f0, #3b82f6, #059669, #e2e8f0);
   }
   .quote-era {
-    padding: 1.5rem;
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s ease;
     position: relative;
-    overflow: hidden;
-  }
-  .quote-era:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    border-color: #3b82f6;
+    margin-bottom: 2.5rem;
   }
   .quote-era::before {
     content: '';
     position: absolute;
-    top: 0; left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, #3b82f6, #8b5cf6);
-    border-radius: 4px 0 0 4px;
+    left: -2.35rem;
+    top: 0.5rem;
+    width: 10px;
+    height: 10px;
+    background: #3b82f6;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #3b82f6;
   }
-  .quote-era:nth-child(even)::before {
-    background: linear-gradient(180deg, #059669, #0d9488);
-  }
-  .quote-era:last-child {
-    grid-column: 1 / -1;
-    max-width: 500px;
-    margin: 0 auto;
-    background: linear-gradient(135deg, #1e3a5f, #1e40af);
-    border: none;
-    color: white;
-  }
-  .quote-era:last-child .era-label { color: #93c5fd; }
-  .quote-era:last-child blockquote { color: #e2e8f0; }
-  .quote-era:last-child cite { color: #93c5fd; }
-  .quote-era:last-child::before { background: #fbbf24; }
+  .quote-era:nth-child(even)::before { background: #059669; box-shadow: 0 0 0 2px #059669; }
+  .quote-era:last-child::before { background: #fbbf24; box-shadow: 0 0 0 2px #fbbf24; }
   .era-label {
     display: inline-block;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     color: #3b82f6;
     margin-bottom: 0.5rem;
     padding: 0.15rem 0.5rem;
@@ -831,44 +801,40 @@ import CategoryGrid from '../components/CategoryGrid.astro';
     border-radius: 4px;
   }
   .quote-era:nth-child(even) .era-label { color: #059669; background: #ecfdf5; }
+  .quote-era:last-child .era-label { color: #b45309; background: #fffbeb; }
   .quote-era blockquote {
     margin: 0;
-    font-size: 0.95rem;
-    line-height: 1.7;
+    font-family: "Noto Serif TC", "Source Han Serif TC", "PMingLiU", serif;
+    font-size: 1.05rem;
+    line-height: 1.9;
     color: #1e293b;
-    font-style: italic;
+    font-style: normal;
   }
   .quote-era cite {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #94a3b8;
     font-style: normal;
-    margin-top: 0.5rem;
+    margin-top: 0.4rem;
   }
   .cover-closing {
     margin-top: 3rem;
     text-align: center;
+    font-family: "Noto Serif TC", "Source Han Serif TC", "PMingLiU", serif;
     font-size: 1.05rem;
     line-height: 1.9;
     color: #475569;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
   }
-  .cover-closing strong { color: #1e293b; }
+  .cover-closing strong { color: #1a1a2e; }
   .cover-closing p { margin-bottom: 1rem; }
   .cover-link {
     display: inline-block;
     margin-top: 0.5rem;
     color: #3b82f6;
     text-decoration: none;
-    font-weight: 600;
-    padding: 0.5rem 1.5rem;
-    border: 2px solid #3b82f6;
-    border-radius: 8px;
-    transition: all 0.2s;
+    font-weight: 500;
   }
-  .cover-link:hover { background: #3b82f6; color: white; }
+  .cover-link:hover { text-decoration: underline; }
 </style>
 
 <script>

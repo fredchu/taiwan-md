@@ -136,10 +136,9 @@ const langPrefix = lang === 'en' ? '/en' : '';
     <a href={`${langPrefix}/${category.slug}`} class="category-card" data-color={category.color}>
       <div class="category-header">
         {category.cover ? (
-          <img src={category.cover} alt={category.name} class="category-cover" loading="lazy" />
-        ) : (
-          <div class="category-icon">{category.icon}</div>
-        )}
+          <img src={category.cover} alt={category.name} class="category-cover" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        ) : null}
+        <div class="category-icon" style={category.cover ? 'display:none' : ''}>{category.icon}</div>
         <div class="category-gradient"></div>
         <div class="article-badge">
           <span class="article-count">{category.articles}</span>
@@ -164,12 +163,11 @@ const langPrefix = lang === 'en' ? '/en' : '';
 <style>
   .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-    margin: 3rem 0;
-    max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 3rem auto;
+    max-width: 1600px;
+    padding: 0 1rem;
   }
   
   .category-card {
