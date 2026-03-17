@@ -1,17 +1,268 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
+import CategoryGrid from '../components/CategoryGrid.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="台灣知識庫" description="開源、AI-friendly 的台灣完整知識庫，讓全世界認識真正的台灣">
+  <section class="hero">
+    <h1 class="hero-title">Taiwan.md</h1>
+    <h2 class="hero-subtitle">讓全世界完整認識台灣</h2>
+    <p class="hero-description">
+      開源、AI-friendly 的台灣知識庫<br>
+      從歷史文化到當代生活，策展式的深度內容
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-number">12+</span>
+        <span class="stat-label">主要面向</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">100+</span>
+        <span class="stat-label">預計文章</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">雙語</span>
+        <span class="stat-label">中英對照</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <h2 class="section-title">為什麼需要 Taiwan.md？</h2>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <h3>策展式內容</h3>
+        <p>不是百科全書，而是精心策展的深度內容。三層閱讀深度設計，適合不同需求。</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🤖</div>
+        <h3>AI-Friendly</h3>
+        <p>結構化內容設計，讓 AI 也能理解台灣。促進跨文化理解與知識傳播。</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🌍</div>
+        <h3>國際視野</h3>
+        <p>中英雙語，從在地觀點出發，用國際語言說台灣故事。</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📚</div>
+        <h3>完整性</h3>
+        <p>涵蓋歷史、地理、文化、美食等 12+ 面向，呈現台灣的完整面貌。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="categories">
+    <h2 class="section-title">探索台灣</h2>
+    <p class="section-subtitle">選擇您感興趣的面向，開始深入了解台灣</p>
+    <CategoryGrid />
+  </section>
+
+  <section class="contribute">
+    <div class="contribute-content">
+      <h2>加入我們</h2>
+      <p>Taiwan.md 是社群驅動的開源專案。無論您是台灣本地人還是對台灣感興趣的國際朋友，都歡迎貢獻您的知識與觀點。</p>
+      <div class="contribute-buttons">
+        <a href="/contributing" class="btn btn-primary">貢獻指南</a>
+        <a href="https://github.com/your-username/taiwan-md" class="btn btn-secondary" target="_blank">
+          GitHub 專案
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    margin: -2rem -1rem 0;
+    margin-bottom: 4rem;
+  }
+  
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(45deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    font-weight: 300;
+  }
+  
+  .hero-description {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    line-height: 1.6;
+  }
+  
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 2rem;
+  }
+  
+  .stat {
+    text-align: center;
+  }
+  
+  .stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fbbf24;
+  }
+  
+  .stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  
+  .section-title {
+    font-size: 2.25rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #1f2937;
+  }
+  
+  .section-subtitle {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+  
+  .features {
+    margin: 4rem 0;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+  }
+  
+  .feature {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+  
+  .feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .feature h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+  }
+  
+  .feature p {
+    color: #6b7280;
+    line-height: 1.6;
+  }
+  
+  .categories {
+    margin: 4rem 0;
+  }
+  
+  .contribute {
+    background: #f9fafb;
+    padding: 4rem 2rem;
+    margin: 4rem -1rem 0;
+    text-align: center;
+    border-radius: 12px;
+  }
+  
+  .contribute-content h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+  }
+  
+  .contribute-content p {
+    font-size: 1.1rem;
+    color: #6b7280;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .contribute-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .btn {
+    padding: 0.75rem 2rem;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary {
+    background: #1e40af;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+  }
+  
+  .btn-secondary {
+    background: white;
+    color: #1e40af;
+    border: 2px solid #1e40af;
+  }
+  
+  .btn-secondary:hover {
+    background: #1e40af;
+    color: white;
+    transform: translateY(-1px);
+  }
+  
+  @media (max-width: 768px) {
+    .hero {
+      padding: 3rem 1rem;
+    }
+    
+    .hero-title {
+      font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.5rem;
+    }
+    
+    .hero-stats {
+      gap: 1.5rem;
+    }
+    
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .contribute-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style>
