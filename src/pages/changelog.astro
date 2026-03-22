@@ -88,6 +88,9 @@ function commitIcon(msg: string) {
                     <p class="commit-message">{commit.message}</p>
                     <div class="commit-meta">
                       <span class="commit-author">{commit.author}</span>
+                      <span class="commit-time" data-date={commit.date}>
+                        {new Date(commit.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                       <a
                         href={`https://github.com/frank890417/taiwan-md/commit/${commit.hash}`}
                         target="_blank"
@@ -105,6 +108,37 @@ function commitIcon(msg: string) {
       }
     </div>
   </div>
+
+  <script is:inline>
+    function updateRelativeTimes() {
+      const timeElements = document.querySelectorAll('.commit-time');
+      const now = new Date();
+
+      timeElements.forEach((el) => {
+        const date = new Date(el.getAttribute('data-date'));
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        let relativeTime = '';
+        if (diffInSeconds < 60) {
+          relativeTime = '剛剛';
+        } else if (diffInSeconds < 3600) {
+          relativeTime = `${Math.floor(diffInSeconds / 60)} 分鐘前`;
+        } else if (diffInSeconds < 86400) {
+          relativeTime = `${Math.floor(diffInSeconds / 3600)} 小時前`;
+        } else if (diffInSeconds < 2592000) {
+          relativeTime = `${Math.floor(diffInSeconds / 86400)} 天前`;
+        } else {
+          relativeTime = date.toLocaleDateString();
+        }
+
+        el.textContent = relativeTime;
+      });
+    }
+
+    // Update on load and then every minute
+    updateRelativeTimes();
+    setInterval(updateRelativeTimes, 60000);
+  </script>
 </Layout>
 
 <style>
@@ -113,6 +147,15 @@ function commitIcon(msg: string) {
     margin: 0 auto;
     padding: 4rem 2rem 6rem;
   }
+  
+  /* ... existing styles ... */
+  
+  .commit-time {
+    color: #94a3b8;
+    margin: 0 0.5rem;
+    font-size: 0.85rem;
+  }
+</style>
 
   .changelog-header {
     text-align: center;
